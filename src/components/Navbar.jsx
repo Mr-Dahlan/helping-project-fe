@@ -4,7 +4,6 @@ import { NavLink, useNavigate } from 'react-router-dom';
 const Navbar = ({ onLogoutClick }) => {
     const navigate = useNavigate();
     
-    // Get cashier info from localStorage (default to mockup details if not logged in)
     const cashierName = localStorage.getItem('cashier_name') || 'Riana Rasti';
     const outletName = localStorage.getItem('cashier_outlet') || 'Tenggilis Mejoyo';
 

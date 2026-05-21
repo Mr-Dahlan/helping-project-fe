@@ -62,10 +62,7 @@ const HistoryPage = () => {
             {/* Controls: Search Bar */}
             <div className="history-controls">
                 <div className="search-bar-container">
-                    <svg className="search-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="11" cy="11" r="8" />
-                        <line x1="21" x2="16.65" y1="21" y2="16.65" />
-                    </svg>
+                    <span style={{ marginRight: '8px', color: '#9ca3af' }}>🔍</span>
                     <input 
                         type="text" 
                         placeholder="Cari nama pelanggan atau invoice..." 
@@ -113,7 +110,7 @@ const HistoryPage = () => {
                                     let badgeClass = 'success';
                                     if (tx.status_pembayaran === 'pending') {
                                         badgeClass = 'pending';
-                                    } else if (tx.status_pembayaran === 'sedang dicuci' || tx.status_pembayaran === 'process') {
+                                    } else if (tx.status_pembayaran === 'sedang dicuci' || tx.status_pembayaran === 'process' || tx.status_pembayaran === 'proses') {
                                         badgeClass = 'process';
                                     }
 

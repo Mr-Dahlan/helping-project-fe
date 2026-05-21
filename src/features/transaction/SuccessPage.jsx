@@ -7,20 +7,20 @@ const SuccessPage = () => {
     const [receipt, setReceipt] = useState(null);
 
     useEffect(() => {
-        // Retrieve last receipt data
+
         const savedReceipt = localStorage.getItem('last_receipt');
         if (savedReceipt) {
             setReceipt(JSON.parse(savedReceipt));
         } else {
-            // Fallback to mockup data
+
             setReceipt({
                 invoice: '1125',
                 nama_pelanggan: 'AMRI PRATAMA',
                 nomor_hp: '08123456789',
                 alamat: 'Tenggilis Mejoyo',
                 subtotal: 20000,
-                tax: 2500,
-                total: 22500,
+                tax: 2000,
+                total: 22000,
                 cart: [
                     { id: 1, name: 'Cuci & Lipat', price: 10000, quantity: 2, unit: 'kg' }
                 ],
@@ -29,7 +29,6 @@ const SuccessPage = () => {
         }
     }, []);
 
-    // Countdown effect to auto redirect
     useEffect(() => {
         const timer = setInterval(() => {
             setCountdown(prev => {
@@ -45,7 +44,6 @@ const SuccessPage = () => {
         return () => clearInterval(timer);
     }, [navigate]);
 
-    // Format number to Rupiah
     const formatRupiah = (num) => {
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
@@ -54,7 +52,6 @@ const SuccessPage = () => {
         }).format(num).replace('Rp', 'Rp ');
     };
 
-    // Format Date string
     const formatDateTime = (dateStr) => {
         const date = new Date(dateStr);
         if (isNaN(date.getTime())) return dateStr;
@@ -160,7 +157,7 @@ const SuccessPage = () => {
                             <span>{formatRupiah(receipt.subtotal)}</span>
                         </div>
                         <div className="receipt-total-row">
-                            <span>Pajak + PPN (12.5%)</span>
+                            <span>Pajak + PPN (11%)</span>
                             <span>{formatRupiah(receipt.tax)}</span>
                         </div>
                         <div className="receipt-total-row grand-total">

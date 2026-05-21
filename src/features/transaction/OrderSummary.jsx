@@ -14,7 +14,7 @@ const OrderSummary = ({
     total,
     paying
 }) => {
-    // Format number to Rupiah
+
     const formatRupiah = (num) => {
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
@@ -63,9 +63,6 @@ const OrderSummary = ({
                     />
                 </div>
 
-                <button className="continue-btn" disabled={true} style={{ opacity: 0.6, cursor: 'not-allowed' }}>
-                    lanjutkan
-                </button>
             </div>
 
             {/* Keranjang Section */}
@@ -101,7 +98,7 @@ const OrderSummary = ({
                         <span>{formatRupiah(subtotal)}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span>Pajak + PPN (12.5%)</span>
+                        <span>Pajak + PPN (11%)</span>
                         <span>{formatRupiah(tax)}</span>
                     </div>
                     <div className="cart-total-section">

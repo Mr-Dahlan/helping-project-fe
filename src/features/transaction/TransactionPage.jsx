@@ -13,19 +13,28 @@ const TransactionPage = () => {
     const [paying, setPaying] = useState(false);
     const [services, setServices] = useState([]);
 
-    // List of services with prices based on category (fallback if API is empty/loading)
     const servicesData = {
         normal: [
-            { id: 1, name: 'Cuci & Lipat', price: 10000, unit: 'kg' },
-            { id: 2, name: 'Setrika Saja', price: 8000, unit: 'kg' },
-            { id: 3, name: 'Cuci Kering Setrika', price: 12000, unit: 'kg' },
+            { id: 1, name: 'Cuci & Lipat', price: 6000, unit: 'kg' },
+            { id: 2, name: 'Setrika Saja', price: 4000, unit: 'kg' },
+            { id: 3, name: 'Cuci Kering Setrika', price: 10000, unit: 'kg' },
             { id: 4, name: 'Pembersih Pakaian', price: 15000, unit: 'item' },
+            { id: 5, name: 'Cuci Selimut', price: 12000, unit: 'kg' },
+            { id: 6, name: 'Cuci Jas', price: 20000, unit: 'kg' },
+            { id: 7, name: 'Cuci Gaun', price: 25000, unit: 'kg' },
+            { id: 8, name: 'Cuci Gorden', price: 12000, unit: 'kg' },
+            { id: 9, name: 'Cuci Seprai', price: 12000, unit: 'kg' },
         ],
         express: [
-            { id: 5, name: 'Cuci & Lipat', price: 15000, unit: 'kg' },
-            { id: 6, name: 'Setrika Saja', price: 12000, unit: 'kg' },
-            { id: 7, name: 'Cuci Kering Setrika', price: 18000, unit: 'kg' },
-            { id: 8, name: 'Pembersih Pakaian', price: 22000, unit: 'item' },
+            { id: 10, name: 'Cuci & Lipat', price: 8000, unit: 'kg' },
+            { id: 11, name: 'Setrika Saja', price: 6000, unit: 'kg' },
+            { id: 12, name: 'Cuci Kering Setrika', price: 12000, unit: 'kg' },
+            { id: 13, name: 'Pembersih Pakaian', price: 18000, unit: 'item' },
+            { id: 14, name: 'Cuci Selimut', price: 17000, unit: 'kg' },
+            { id: 15, name: 'Cuci Jas', price: 30000, unit: 'kg' },
+            { id: 16, name: 'Cuci Gaun', price: 35000, unit: 'kg' },
+            { id: 17, name: 'Cuci Gorden', price: 17000, unit: 'kg' },
+            { id: 18, name: 'Cuci Seprai', price: 17000, unit: 'kg' },
         ]
     };
 
@@ -55,7 +64,6 @@ const TransactionPage = () => {
         ? services.filter(s => s.kategori === category)
         : servicesData[category];
 
-    // Add item to cart
     const handleAddService = (serviceId) => {
         const service = activeServices.find(s => s.id === serviceId);
         if (!service) return;
@@ -74,7 +82,6 @@ const TransactionPage = () => {
         });
     };
 
-    // Increment qty
     const handleIncreaseQty = (itemId) => {
         setCart(prevCart => 
             prevCart.map(item => 
@@ -83,7 +90,6 @@ const TransactionPage = () => {
         );
     };
 
-    // Decrement qty
     const handleDecreaseQty = (itemId) => {
         setCart(prevCart => 
             prevCart.map(item => 
@@ -92,14 +98,12 @@ const TransactionPage = () => {
         );
     };
 
-    // Remove item
     const handleRemoveItem = (itemId) => {
         setCart(prevCart => prevCart.filter(item => item.id !== itemId));
     };
 
-    // Cart calculations
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const tax = Math.round(subtotal * 0.125); // 12.5% tax (VAT + service fee)
+    const tax = Math.round(subtotal * 0.11); // 11% tax (VAT + service fee)
     const total = subtotal + tax;
 
     const handleBayar = async () => {
