@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useOutletContext } from 'react-router-dom';
 import axios from 'axios';
+import { updateTransactionStatus } from '../../service/transactionService';
 
 const DashboardPage = () => {
     const navigate = useNavigate();
@@ -16,10 +17,10 @@ const DashboardPage = () => {
 
     // Mock recent transactions for when the database is empty
     const mockTransactions = [
-        { id: 1001, nama_pelanggan: 'Amri Pratama', layanan: 'Cuci kering setrika', total_harga: 15000, status_pembayaran: 'sedang dicuci', created_at: '2025-10-24T12:00:00Z' },
-        { id: 1002, nama_pelanggan: 'Rina Saputri', layanan: 'Cuci kering setrika', total_harga: 30000, status_pembayaran: 'selesai', created_at: '2025-11-12T14:30:00Z' },
-        { id: 1003, nama_pelanggan: 'Fajar Nugroho', layanan: 'Cuci Kering (Biasa)', total_harga: 60000, status_pembayaran: 'selesai', created_at: '2025-11-16T09:15:00Z' },
-        { id: 1004, nama_pelanggan: 'Dwi Lestari', layanan: 'Cuci kering (Setrika)', total_harga: 40000, status_pembayaran: 'selesai', created_at: '2025-12-22T16:45:00Z' }
+        { id: 1001, nama_pelanggan: 'Amri Pratama', layanan: 'Cuci kering setrika', total_harga: 16875, status_pembayaran: 'selesai', created_at: '2026-05-24T09:15:00+07:00' },
+        { id: 1002, nama_pelanggan: 'Rina Saputri', layanan: 'Cuci kering setrika', total_harga: 33750, status_pembayaran: 'selesai', created_at: '2026-05-25T13:45:00+07:00' },
+        { id: 1003, nama_pelanggan: 'Fajar Nugroho', layanan: 'Cuci Kering (Biasa)', total_harga: 49500, status_pembayaran: 'selesai', created_at: '2026-05-26T10:30:00+07:00' },
+        { id: 1004, nama_pelanggan: 'Dwi Lestari', layanan: 'Cuci kering (Setrika)', total_harga: 33750, status_pembayaran: 'pending', created_at: '2026-05-26T15:20:00+07:00' }
     ];
 
     useEffect(() => {
@@ -58,7 +59,103 @@ const DashboardPage = () => {
     };
 
     const handleLaporan = () => {
-        alert("Laporan akhir hari berhasil dibuat & diunduh!");
+        const todayStr = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        const dateIso = new Date().toISOString().split('T')[0];
+        
+        let reportText = `==================================================\n`;
+        reportText += `       LAPORAN AKHIR HARI - LAUNDRYinAja\n`;
+        reportText += `       Tanggal: ${todayStr}\n`;
+        reportText += `==================================================\n\n`;
+        reportText += `RINGKASAN TRANSAKSI HARI INI:\n`;
+        reportText += `--------------------------------------------------\n`;
+        reportText += `Total Order       : ${stats.order_hari_ini} transaksi\n`;
+        reportText += `Pelanggan Aktif   : ${stats.pelanggan_aktif} orang\n`;
+        reportText += `Status Antrean    : ${stats.proses} (Pending/Total)\n`;
+        reportText += `Total Pemasukan   : ${formatRupiah(stats.pemasukan_hari_ini)}\n\n`;
+        
+        reportText += `DAFTAR TRANSAKSI TERBARU:\n`;
+        reportText += `--------------------------------------------------\n`;
+        
+        const txList = stats.latest_transactions && stats.latest_transactions.length > 0 
+            ? stats.latest_transactions 
+            : mockTransactions;
+            
+        txList.forEach((tx) => {
+            const isMockId = String(tx.id).length === 4;
+            const invoiceLabel = isMockId ? tx.id : (tx.invoice || `TX-${tx.id}`);
+            const layananName = tx.layanan || 'Cuci kering setrika';
+            const priceLabel = formatRupiah(tx.total_harga);
+            const statusLabel = tx.status_pembayaran;
+            const timeLabel = new Date(tx.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
+            
+            reportText += `#${invoiceLabel} | ${tx.nama_pelanggan.padEnd(16)} | ${layananName.padEnd(20)} | ${priceLabel.padEnd(12)} | [${statusLabel}] | ${timeLabel}\n`;
+        });
+        
+        reportText += `\n==================================================\n`;
+        reportText += `Laporan digenerate secara otomatis pada ${new Date().toLocaleTimeString('id-ID')} WIB.\n`;
+        reportText += `==================================================\n`;
+
+        // 1. Save to Local Storage
+        try {
+            localStorage.setItem(`laporan_${dateIso}`, reportText);
+            
+            const reportIndex = JSON.parse(localStorage.getItem('riwayat_laporan_index') || '[]');
+            if (!reportIndex.includes(dateIso)) {
+                reportIndex.push(dateIso);
+                localStorage.setItem('riwayat_laporan_index', JSON.stringify(reportIndex));
+            }
+        } catch (e) {
+            console.error("Gagal menyimpan laporan ke localStorage", e);
+        }
+
+        // 2. Download as File
+        const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `laporan_akhir_hari_${dateIso}.txt`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        alert(`Laporan akhir hari (${dateIso}) berhasil diunduh dan disimpan di Local Storage!`);
+    };
+
+    const handleStatusChange = async (id, newStatus) => {
+        try {
+            await updateTransactionStatus(id, newStatus);
+            
+            // Update stats or local transactions
+            setStats(prev => {
+                const updatedList = (prev.latest_transactions || []).map(tx => 
+                    tx.id === id ? { ...tx, status_pembayaran: newStatus } : tx
+                );
+                
+                // Recalculate pending vs total processes
+                const pendingCount = updatedList.filter(tx => tx.status_pembayaran === 'pending').length;
+                const totalCount = updatedList.length;
+                const processString = `${pendingCount}/${totalCount}`;
+
+                return {
+                    ...prev,
+                    proses: totalCount > 0 ? processString : prev.proses,
+                    latest_transactions: updatedList
+                };
+            });
+            
+            alert(`Status transaksi #${id} berhasil diubah menjadi ${newStatus}`);
+        } catch (err) {
+            console.error("Gagal memperbarui status transaksi", err);
+            // Dynamic UI fallback update
+            setStats(prev => ({
+                ...prev,
+                latest_transactions: (prev.latest_transactions || []).map(tx => 
+                    tx.id === id ? { ...tx, status_pembayaran: newStatus } : tx
+                )
+            }));
+            alert(`Status transaksi berhasil diperbarui secara lokal.`);
+        }
     };
 
     const transactionsToRender = stats.latest_transactions && stats.latest_transactions.length > 0
@@ -279,11 +376,22 @@ const DashboardPage = () => {
                                         <td style={{ fontWeight: '600' }}>{invoiceLabel}</td>
                                         <td>{tx.nama_pelanggan}</td>
                                         <td>{layananName}</td>
-                                        <td>{formatRupiah(tx.total_harga)}</td>
+                                        <td className="price-text">{formatRupiah(tx.total_harga)}</td>
                                         <td>
-                                            <span className={`badge ${badgeClass}`}>
-                                                {tx.status_pembayaran === 'success' ? 'selesai' : tx.status_pembayaran}
-                                            </span>
+                                            <select 
+                                                value={tx.status_pembayaran === 'success' ? 'selesai' : (tx.status_pembayaran === 'sedang dicuci' || tx.status_pembayaran === 'process' ? 'proses' : tx.status_pembayaran)}
+                                                onChange={(e) => handleStatusChange(tx.id, e.target.value)}
+                                                className={`status-select ${
+                                                    tx.status_pembayaran === 'selesai' || tx.status_pembayaran === 'success' ? 'success' :
+                                                    tx.status_pembayaran === 'proses' || tx.status_pembayaran === 'sedang dicuci' || tx.status_pembayaran === 'process' ? 'process' :
+                                                    tx.status_pembayaran === 'cancel' ? 'cancel' : 'pending'
+                                                }`}
+                                            >
+                                                <option value="pending">pending</option>
+                                                <option value="proses">proses</option>
+                                                <option value="selesai">selesai</option>
+                                                <option value="cancel">cancel</option>
+                                            </select>
                                         </td>
                                         <td>{formatDate(tx.created_at)}</td>
                                     </tr>

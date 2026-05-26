@@ -27,9 +27,9 @@ const OrderSummary = ({
     const isFormIncomplete = !customer.nama.trim() || !customer.nomor.trim() || !customer.alamat.trim();
 
     return (
-        <div className="transaction-right-panel">
+        <div className="transaction-right-panel" style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: '20px', overflow: 'hidden' }}>
             {/* Info Pelanggan Section */}
-            <div className="client-info-card">
+            <div className="client-info-card" style={{ flexShrink: 0 }}>
                 <h3 className="client-info-title">Info pelanggan</h3>
                 
                 <div className="form-group">
@@ -52,7 +52,7 @@ const OrderSummary = ({
                     />
                 </div>
 
-                <div className="form-group">
+                <div className="form-group" style={{ marginBottom: 0 }}>
                     <textarea 
                         placeholder="Alamat" 
                         value={customer.alamat} 
@@ -66,15 +66,15 @@ const OrderSummary = ({
             </div>
 
             {/* Keranjang Section */}
-            <div className="cart-card">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <div className="cart-card" style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexShrink: 0 }}>
                     <h3 className="cart-title" style={{ margin: 0 }}>Keranjang</h3>
                     <span style={{ fontSize: '13px', color: '#6b7280', fontWeight: '500' }}>
                         {cart.reduce((sum, item) => sum + item.quantity, 0)} Porsi/kg
                     </span>
                 </div>
 
-                <div className="cart-items-list">
+                <div className="cart-items-list" style={{ flexGrow: 1, overflowY: 'auto', marginBottom: '16px', maxHeight: 'none' }}>
                     {isCartEmpty ? (
                         <div style={{ textAlign: 'center', color: '#9ca3af', padding: '24px 0', fontSize: '14px' }}>
                             Keranjang kosong
@@ -92,28 +92,28 @@ const OrderSummary = ({
                     )}
                 </div>
 
-                <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', color: '#4b5563' }}>
+                <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', color: '#4b5563', flexShrink: 0 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <span>Layanan Laundry</span>
-                        <span>{formatRupiah(subtotal)}</span>
+                        <span className="price-text">{formatRupiah(subtotal)}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <span>Pajak + PPN (11%)</span>
-                        <span>{formatRupiah(tax)}</span>
+                        <span className="price-text">{formatRupiah(tax)}</span>
                     </div>
-                    <div className="cart-total-section">
+                    <div className="cart-total-section" style={{ marginBottom: '16px' }}>
                         <span>TOTAL</span>
-                        <span>{formatRupiah(total)}</span>
+                        <span className="price-text">{formatRupiah(total)}</span>
                     </div>
+                    <button 
+                        className="pay-btn" 
+                        onClick={onPay}
+                        disabled={isCartEmpty || isFormIncomplete || paying}
+                        style={{ width: '100%', display: 'block' }}
+                    >
+                        {paying ? 'Memproses...' : 'Selesaikan Pembayaran'}
+                    </button>
                 </div>
-
-                <button 
-                    className="pay-btn" 
-                    onClick={onPay}
-                    disabled={isCartEmpty || isFormIncomplete || paying}
-                >
-                    {paying ? 'Memproses...' : 'Selesaikan Pembayaran'}
-                </button>
             </div>
         </div>
     );

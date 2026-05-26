@@ -154,15 +154,15 @@ const SuccessPage = () => {
                     <div className="receipt-total-box">
                         <div className="receipt-total-row">
                             <span>Subtotal</span>
-                            <span>{formatRupiah(receipt.subtotal)}</span>
+                            <span className="price-text">{formatRupiah(receipt.subtotal)}</span>
                         </div>
                         <div className="receipt-total-row">
                             <span>Pajak + PPN (11%)</span>
-                            <span>{formatRupiah(receipt.tax)}</span>
+                            <span className="price-text">{formatRupiah(receipt.tax)}</span>
                         </div>
                         <div className="receipt-total-row grand-total">
                             <span>total</span>
-                            <span>{formatRupiah(receipt.total)}</span>
+                            <span className="price-text">{formatRupiah(receipt.total)}</span>
                         </div>
                     </div>
 

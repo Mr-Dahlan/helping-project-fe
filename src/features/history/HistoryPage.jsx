@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { updateTransactionStatus } from '../../service/transactionService';
 
 const HistoryPage = () => {
     const [transactions, setTransactions] = useState([]);
@@ -9,13 +10,14 @@ const HistoryPage = () => {
     useEffect(() => {
         const fetchHistory = async () => {
             try {
+                // Memastikan fallback URL mengarah ke backend Laravel/Express kamu
                 const apiURL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
                 const res = await axios.get(`${apiURL}/orders`);
                 if (res.data.status === 'success') {
                     setTransactions(res.data.data);
                 }
             } catch (err) {
-                console.error("Gagal mengambil riwayat transaksi", err);
+                console.error("Gagal mengambil riwayat transaksi:", err);
             } finally {
                 setLoading(false);
             }
@@ -24,8 +26,9 @@ const HistoryPage = () => {
         fetchHistory();
     }, []);
 
-    // Format number to Rupiah
+    // Format angka ke Rupiah
     const formatRupiah = (num) => {
+        if (num === undefined || num === null) return 'Rp 0';
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
             currency: 'IDR',
@@ -33,28 +36,46 @@ const HistoryPage = () => {
         }).format(num).replace('Rp', 'Rp ');
     };
 
-    // Format Date string
+    // Format string tanggal
     const formatDate = (dateStr) => {
+        if (!dateStr) return '-';
         const date = new Date(dateStr);
         if (isNaN(date.getTime())) return dateStr;
         const options = { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' };
-        return date.toLocaleDateString('en-US', options);
+        return date.toLocaleDateString('id-ID', options) + ' WIB'; // Diubah ke id-ID agar serasi dengan Rupiah dan menambahkan WIB
     };
 
-    // Filter transactions based on query
+    const handleStatusChange = async (id, newStatus) => {
+        try {
+            await updateTransactionStatus(id, newStatus);
+            setTransactions(prev => 
+                prev.map(tx => tx.id === id ? { ...tx, status_pembayaran: newStatus } : tx)
+            );
+            alert(`Status transaksi #${id} berhasil diubah menjadi ${newStatus}`);
+        } catch (err) {
+            console.error("Gagal memperbarui status transaksi:", err);
+            // Local fallback update for offline testing
+            setTransactions(prev => 
+                prev.map(tx => tx.id === id ? { ...tx, status_pembayaran: newStatus } : tx)
+            );
+            alert(`Status transaksi berhasil diperbarui secara lokal.`);
+        }
+    };
+
+    // Filter transaksi berdasarkan query pencarian
     const filteredTransactions = transactions.filter(tx => {
         const query = searchQuery.toLowerCase();
-        const invoice = String(tx.invoice || tx.id).toLowerCase();
-        const name = String(tx.nama_pelanggan).toLowerCase();
+        const invoice = String(tx.invoice || tx.id || '').toLowerCase();
+        const name = String(tx.nama_pelanggan || '').toLowerCase();
         return invoice.includes(query) || name.includes(query);
     });
 
     return (
         <div>
-            {/* Header section */}
+            {/* Header Section */}
             <div className="dashboard-header">
                 <div className="header-title">
-                    <h1>Riwayat transaksi</h1>
+                    <h1>Riwayat Transaksi</h1>
                     <p>Daftar seluruh transaksi yang telah tercatat di outlet.</p>
                 </div>
             </div>
@@ -100,17 +121,19 @@ const HistoryPage = () => {
                                     <th>No Handphone</th>
                                     <th>Alamat</th>
                                     <th>Total Bayar</th>
-                                    <th>Status</th>
+                                    <th>Status Pembayaran</th>
                                     <th>Tanggal & Waktu</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {filteredTransactions.map((tx) => {
-                                    // Status badges styling
+                                    // Dinamisasi kelas badge status
                                     let badgeClass = 'success';
-                                    if (tx.status_pembayaran === 'pending') {
+                                    const status = String(tx.status_pembayaran || '').toLowerCase();
+                                    
+                                    if (status === 'pending' || status === 'belum bayar') {
                                         badgeClass = 'pending';
-                                    } else if (tx.status_pembayaran === 'sedang dicuci' || tx.status_pembayaran === 'process' || tx.status_pembayaran === 'proses') {
+                                    } else if (status === 'sedang dicuci' || status === 'process' || status === 'proses') {
                                         badgeClass = 'process';
                                     }
 
@@ -120,11 +143,22 @@ const HistoryPage = () => {
                                             <td>{tx.nama_pelanggan}</td>
                                             <td>{tx.nomor_hp || '-'}</td>
                                             <td>{tx.alamat || '-'}</td>
-                                            <td>{formatRupiah(tx.total_harga)}</td>
+                                            <td className="price-text">{formatRupiah(tx.total_harga)}</td>
                                             <td>
-                                                <span className={`badge ${badgeClass}`}>
-                                                    {tx.status_pembayaran}
-                                                </span>
+                                                <select 
+                                                    value={tx.status_pembayaran === 'success' ? 'selesai' : (tx.status_pembayaran === 'sedang dicuci' || tx.status_pembayaran === 'process' ? 'proses' : tx.status_pembayaran)}
+                                                    onChange={(e) => handleStatusChange(tx.id, e.target.value)}
+                                                    className={`status-select ${
+                                                        tx.status_pembayaran === 'selesai' || tx.status_pembayaran === 'success' ? 'success' :
+                                                        tx.status_pembayaran === 'proses' || tx.status_pembayaran === 'sedang dicuci' || tx.status_pembayaran === 'process' ? 'process' :
+                                                        tx.status_pembayaran === 'cancel' ? 'cancel' : 'pending'
+                                                    }`}
+                                                >
+                                                    <option value="pending">pending</option>
+                                                    <option value="proses">proses</option>
+                                                    <option value="selesai">selesai</option>
+                                                    <option value="cancel">cancel</option>
+                                                </select>
                                             </td>
                                             <td>{formatDate(tx.created_at)}</td>
                                         </tr>

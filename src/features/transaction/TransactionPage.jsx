@@ -13,28 +13,31 @@ const TransactionPage = () => {
     const [paying, setPaying] = useState(false);
     const [services, setServices] = useState([]);
 
+    // List of services with prices based on category (fallback if API is empty/loading)
     const servicesData = {
         normal: [
-            { id: 1, name: 'Cuci & Lipat', price: 6000, unit: 'kg' },
-            { id: 2, name: 'Setrika Saja', price: 4000, unit: 'kg' },
-            { id: 3, name: 'Cuci Kering Setrika', price: 10000, unit: 'kg' },
+            { id: 1, name: 'Cuci & Lipat', price: 10000, unit: 'kg' },
+            { id: 2, name: 'Setrika Saja', price: 8000, unit: 'kg' },
+            { id: 3, name: 'Cuci Kering Setrika', price: 12000, unit: 'kg' },
             { id: 4, name: 'Pembersih Pakaian', price: 15000, unit: 'item' },
-            { id: 5, name: 'Cuci Selimut', price: 12000, unit: 'kg' },
-            { id: 6, name: 'Cuci Jas', price: 20000, unit: 'kg' },
-            { id: 7, name: 'Cuci Gaun', price: 25000, unit: 'kg' },
-            { id: 8, name: 'Cuci Gorden', price: 12000, unit: 'kg' },
-            { id: 9, name: 'Cuci Seprai', price: 12000, unit: 'kg' },
+            { id: 5, name: 'Cuci Selimut', price: 20000, unit: 'item' },
+            { id: 6, name: 'Cuci Gorden', price: 15000, unit: 'kg' },
+            { id: 7, name: 'Cuci Seprai', price: 15000, unit: 'item' },
+            { id: 8, name: 'Permak Pakaian', price: 15000, unit: 'item' },
+            { id: 9, name: 'Cuci Bed Cover', price: 25000, unit: 'item' },
+            { id: 10, name: 'Cuci Sepatu', price: 30000, unit: 'pasang' },
         ],
         express: [
-            { id: 10, name: 'Cuci & Lipat', price: 8000, unit: 'kg' },
-            { id: 11, name: 'Setrika Saja', price: 6000, unit: 'kg' },
-            { id: 12, name: 'Cuci Kering Setrika', price: 12000, unit: 'kg' },
-            { id: 13, name: 'Pembersih Pakaian', price: 18000, unit: 'item' },
-            { id: 14, name: 'Cuci Selimut', price: 17000, unit: 'kg' },
-            { id: 15, name: 'Cuci Jas', price: 30000, unit: 'kg' },
-            { id: 16, name: 'Cuci Gaun', price: 35000, unit: 'kg' },
-            { id: 17, name: 'Cuci Gorden', price: 17000, unit: 'kg' },
-            { id: 18, name: 'Cuci Seprai', price: 17000, unit: 'kg' },
+            { id: 11, name: 'Cuci & Lipat', price: 15000, unit: 'kg' },
+            { id: 12, name: 'Setrika Saja', price: 12000, unit: 'kg' },
+            { id: 13, name: 'Cuci Kering Setrika', price: 18000, unit: 'kg' },
+            { id: 14, name: 'Pembersih Pakaian', price: 22000, unit: 'item' },
+            { id: 15, name: 'Cuci Selimut', price: 30000, unit: 'item' },
+            { id: 16, name: 'Cuci Gorden', price: 22000, unit: 'kg' },
+            { id: 17, name: 'Cuci Seprai', price: 22000, unit: 'item' },
+            { id: 18, name: 'Permak Pakaian', price: 25000, unit: 'item' },
+            { id: 19, name: 'Cuci Bed Cover', price: 37000, unit: 'item' },
+            { id: 20, name: 'Cuci Sepatu', price: 45000, unit: 'pasang' },
         ]
     };
 
@@ -179,13 +182,13 @@ const TransactionPage = () => {
             </div>
 
             {/* Main grid content */}
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.2fr', gap: '24px', alignItems: 'start' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.2fr', gap: '24px', alignItems: 'stretch', height: 'calc(100vh - 120px)', overflow: 'hidden' }}>
                 {/* Left Panel: Services Catalog */}
-                <div style={{ background: '#ffffff', borderRadius: '14px', padding: '24px', border: '1px solid #e5e7eb' }}>
+                <div style={{ background: '#ffffff', borderRadius: '14px', padding: '24px', border: '1px solid #e5e7eb', height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                     {/* Category Filter */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px', flexShrink: 0 }}>
                         <span style={{ fontWeight: '600', fontSize: '15px' }}>pilih layanan</span>
-                        <div className="service-filter">
+                        <div className="service-filter" style={{ marginBottom: 0 }}>
                             <button 
                                 className={`filter-btn ${category === 'express' ? 'active' : ''}`}
                                 onClick={() => setCategory('express')}
@@ -202,7 +205,7 @@ const TransactionPage = () => {
                     </div>
 
                     {/* Services Grid */}
-                    <div className="services-grid">
+                    <div className="services-grid" style={{ flexGrow: 1, overflowY: 'auto', paddingRight: '4px' }}>
                         {activeServices.map(service => (
                             <ServiceCard 
                                 key={service.id}

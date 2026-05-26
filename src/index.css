@@ -218,6 +218,7 @@ body {
   color: var(--text-muted);
   margin-bottom: 8px;
   font-weight: 500;
+  white-space: nowrap !important;
 }
 
 .metric-value {
@@ -418,6 +419,49 @@ body {
   color: var(--color-blue);
 }
 
+.status-select {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+  border: 1px solid transparent;
+  cursor: pointer;
+  outline: none;
+  font-family: inherit;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-align-last: center;
+  transition: all 0.2s ease;
+}
+
+.status-select.success {
+  background-color: var(--color-green-bg);
+  color: var(--color-green);
+}
+
+.status-select.pending {
+  background-color: var(--color-orange-bg);
+  color: var(--color-orange);
+}
+
+.status-select.process {
+  background-color: var(--color-blue-bg);
+  color: var(--color-blue);
+}
+
+.status-select.cancel {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+.status-select:hover {
+  filter: brightness(0.95);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
 /* Confirmation Modal */
 .modal-overlay {
   position: fixed;
@@ -492,20 +536,38 @@ body {
 }
 
 .filter-btn {
-  padding: 6px 16px;
-  border-radius: 20px;
-  border: 1px solid var(--border-color);
+  padding: 10px 24px;
+  border-radius: 24px;
+  border: 2px solid var(--border-color);
   background-color: #ffffff;
   color: var(--text-muted);
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
+  text-transform: capitalize;
+}
+
+.filter-btn:hover {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
 }
 
 .filter-btn.active {
-  background-color: #0f172a;
-  color: #ffffff;
-  border-color: #0f172a;
+  background-color: #e0f2fe;
+  color: #0284c7;
+  border-color: #3b82f6;
+}
+
+/* Force price text on any page to be single-line */
+.price-text,
+.service-card-price,
+.cart-item-price,
+.cart-total-section span,
+.receipt-item-price,
+.receipt-total-row span,
+.metric-value {
+  white-space: nowrap !important;
 }
 
 .services-grid {
