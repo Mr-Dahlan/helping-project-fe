@@ -15,7 +15,6 @@ const DashboardPage = () => {
     });
     const [loading, setLoading] = useState(true);
 
-    // Mock recent transactions for when the database is empty
     const mockTransactions = [
         { id: 1001, nama_pelanggan: 'Amri Pratama', layanan: 'Cuci kering setrika', total_harga: 16875, status_pembayaran: 'selesai', created_at: '2026-05-24T09:15:00+07:00' },
         { id: 1002, nama_pelanggan: 'Rina Saputri', layanan: 'Cuci kering setrika', total_harga: 33750, status_pembayaran: 'selesai', created_at: '2026-05-25T13:45:00+07:00' },
@@ -41,7 +40,6 @@ const DashboardPage = () => {
         fetchDashboardData();
     }, []);
 
-    // Format number to Indonesian Rupiah (IDR)
     const formatRupiah = (num) => {
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
@@ -95,7 +93,6 @@ const DashboardPage = () => {
         reportText += `Laporan digenerate secara otomatis pada ${new Date().toLocaleTimeString('id-ID')} WIB.\n`;
         reportText += `==================================================\n`;
 
-        // 1. Save to Local Storage
         try {
             localStorage.setItem(`laporan_${dateIso}`, reportText);
             
@@ -108,7 +105,6 @@ const DashboardPage = () => {
             console.error("Gagal menyimpan laporan ke localStorage", e);
         }
 
-        // 2. Download as File
         const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
@@ -126,7 +122,6 @@ const DashboardPage = () => {
         try {
             await updateTransactionStatus(id, newStatus);
             
-            // Update stats or local transactions
             setStats(prev => {
                 const updatedList = (prev.latest_transactions || []).map(tx => 
                     tx.id === id ? { ...tx, status_pembayaran: newStatus } : tx
@@ -147,7 +142,6 @@ const DashboardPage = () => {
             alert(`Status transaksi #${id} berhasil diubah menjadi ${newStatus}`);
         } catch (err) {
             console.error("Gagal memperbarui status transaksi", err);
-            // Dynamic UI fallback update
             setStats(prev => ({
                 ...prev,
                 latest_transactions: (prev.latest_transactions || []).map(tx => 
@@ -241,7 +235,7 @@ const DashboardPage = () => {
                 {/* SVG Line Chart Card */}
                 <div className="chart-card">
                     <div className="chart-header">
-                        <span className="chart-title">Pertumbuhan Mingguan</span>
+                        <span className="chart-title">Stats Mingguan</span>
                     </div>
                     <div className="chart-container">
                         <svg viewBox="0 0 500 160" width="100%" height="100%" style={{ overflow: 'visible' }}>
@@ -349,7 +343,7 @@ const DashboardPage = () => {
                     <table className="data-table">
                         <thead>
                             <tr>
-                                <th># Transaksi</th>
+                                <th>Transaksi</th>
                                 <th>Pelanggan</th>
                                 <th>Layanan</th>
                                 <th>Harga</th>

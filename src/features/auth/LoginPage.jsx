@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import InputField from '../../components/InputField';
 
 const LoginPage = () => {
     const [username, setUsername] = useState('');
@@ -12,8 +11,14 @@ const LoginPage = () => {
 
     useEffect(() => {
         const loggedIn = localStorage.getItem('cashier_logged_in');
+        const savedRole = localStorage.getItem('user_role');
+        
         if (loggedIn === 'true') {
-            navigate('/');
+            if (savedRole === 'admin') {
+                navigate('/dashboard/AdminDashboard');
+            } else {
+                navigate('/');
+            }
         }
     }, [navigate]);
 
@@ -31,9 +36,12 @@ const LoginPage = () => {
 
             if (res.data.status === 'success') {
                 localStorage.setItem('cashier_logged_in', 'true');
+                localStorage.setItem('user_role', res.data.role);
                 localStorage.setItem('cashier_name', res.data.data.user.name);
                 localStorage.setItem('cashier_outlet', res.data.data.user.outlet || 'Tenggilis Mejoyo');
-                navigate('/');
+                
+                const targetRoute = res.data.redirect_to === '/dashboard' ? '/' : res.data.redirect_to;
+                navigate(targetRoute);
             } else {
                 setError('Login gagal. Silakan coba lagi.');
             }
@@ -98,16 +106,7 @@ const LoginPage = () => {
                         className="login-submit-btn"
                         disabled={loading}
                     >
-                        {loading ? 'Menghubungkan...' : (
-                            <>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-                                    <polyline points="10 17 15 12 10 7" />
-                                    <line x1="15" x2="3" y1="12" y2="12" />
-                                </svg>
-                                Masuk
-                            </>
-                        )}
+                        {loading ? 'Menghubungkan...' : 'Masuk'}
                     </button>
                 </form>
             </div>

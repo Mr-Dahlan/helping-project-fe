@@ -6,6 +6,8 @@ const Navbar = ({ onLogoutClick }) => {
     
     const cashierName = localStorage.getItem('cashier_name') || 'Riana Rasti';
     const outletName = localStorage.getItem('cashier_outlet') || 'Tenggilis Mejoyo';
+    // Mengambil status role pengguna
+    const role = localStorage.getItem('user_role');
 
     return (
         <aside className="sidebar">
@@ -22,41 +24,112 @@ const Navbar = ({ onLogoutClick }) => {
 
                 {/* Menu Section */}
                 <nav className="sidebar-menu">
-                    <NavLink 
-                        to="/" 
-                        className={({ isActive }) => isActive ? "sidebar-item active" : "sidebar-item"}
-                    >
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <rect width="7" height="9" x="3" y="3" rx="1" />
-                            <rect width="7" height="5" x="14" y="3" rx="1" />
-                            <rect width="7" height="9" x="14" y="12" rx="1" />
-                            <rect width="7" height="5" x="3" y="16" rx="1" />
-                        </svg>
-                        Dashboard
-                    </NavLink>
+                    {/* 1. JIKA YANG LOGIN ADALAH ADMIN */}
+                    {role === 'admin' ? (
+                        <>
+                            <NavLink 
+                                to="/" 
+                                className={({ isActive }) => isActive ? "sidebar-item active" : "sidebar-item"}
+                            >
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <rect width="7" height="9" x="3" y="3" rx="1" />
+                                    <rect width="7" height="5" x="14" y="3" rx="1" />
+                                    <rect width="7" height="9" x="14" y="12" rx="1" />
+                                    <rect width="7" height="5" x="3" y="16" rx="1" />
+                                </svg>
+                                Dashboard Admin
+                            </NavLink>
 
-                    <NavLink 
-                        to="/transaksi" 
-                        className={({ isActive }) => isActive ? "sidebar-item active" : "sidebar-item"}
-                    >
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <rect width="18" height="18" x="3" y="3" rx="2" />
-                            <path d="M8 12h8" />
-                            <path d="M12 8v8" />
-                        </svg>
-                        Input transaksi
-                    </NavLink>
+                            <NavLink 
+                                to="/admin/financial-reports" 
+                                className={({ isActive }) => isActive ? "sidebar-item active" : "sidebar-item"}
+                            >
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="12" x2="12" y1="2" y2="22" />
+                                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                                </svg>
+                                Laporan Keuangan
+                            </NavLink>
 
-                    <NavLink 
-                        to="/riwayat" 
-                        className={({ isActive }) => isActive ? "sidebar-item active" : "sidebar-item"}
-                    >
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M12 8v4l3 3" />
-                            <circle cx="12" cy="12" r="10" />
-                        </svg>
-                        Riwayat transaksi
-                    </NavLink>
+                            <NavLink 
+                                to="/admin/product-management" 
+                                className={({ isActive }) => isActive ? "sidebar-item active" : "sidebar-item"}
+                            >
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="m7.5 4.27 9 5.15" />
+                                    <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+                                    <path d="m3.3 7 8.7 5 8.7-5" />
+                                    <path d="M12 22V12" />
+                                </svg>
+                                Manajemen Produk
+                            </NavLink>
+
+                            <NavLink 
+                                to="/admin/user-management" 
+                                className={({ isActive }) => isActive ? "sidebar-item active" : "sidebar-item"}
+                            >
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                                    <circle cx="9" cy="7" r="4" />
+                                    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                                </svg>
+                                Manajemen User
+                            </NavLink>
+
+                            <NavLink 
+                                to="/admin/customer-database" 
+                                className={({ isActive }) => isActive ? "sidebar-item active" : "sidebar-item"}
+                            >
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                    <circle cx="9" cy="7" r="4" />
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                                </svg>
+                                Database Pelanggan
+                            </NavLink>
+                        </>
+                    ) : (
+                        /* 2. JIKA YANG LOGIN ADALAH KASIR / USER BIAYA */
+                        <>
+                            <NavLink 
+                                to="/" 
+                                className={({ isActive }) => isActive ? "sidebar-item active" : "sidebar-item"}
+                            >
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <rect width="7" height="9" x="3" y="3" rx="1" />
+                                    <rect width="7" height="5" x="14" y="3" rx="1" />
+                                    <rect width="7" height="9" x="14" y="12" rx="1" />
+                                    <rect width="7" height="5" x="3" y="16" rx="1" />
+                                </svg>
+                                Dashboard
+                            </NavLink>
+
+                            <NavLink 
+                                to="/transaksi" 
+                                className={({ isActive }) => isActive ? "sidebar-item active" : "sidebar-item"}
+                            >
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <rect width="18" height="18" x="3" y="3" rx="2" />
+                                    <path d="M8 12h8" />
+                                    <path d="M12 8v8" />
+                                </svg>
+                                Input transaksi
+                            </NavLink>
+
+                            <NavLink 
+                                to="/riwayat" 
+                                className={({ isActive }) => isActive ? "sidebar-item active" : "sidebar-item"}
+                            >
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M12 8v4l3 3" />
+                                    <circle cx="12" cy="12" r="10" />
+                                </svg>
+                                Riwayat transaksi
+                            </NavLink>
+                        </>
+                    )}
                 </nav>
             </div>
 
@@ -68,7 +141,7 @@ const Navbar = ({ onLogoutClick }) => {
                     </div>
                     <div className="profile-details">
                         <span className="profile-name">{cashierName}</span>
-                        <span className="profile-role">{outletName}</span>
+                        <span className="profile-role">{role === 'admin' ? 'Super Admin' : outletName}</span>
                     </div>
                 </div>
 

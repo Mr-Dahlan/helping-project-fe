@@ -182,9 +182,9 @@ const TransactionPage = () => {
             </div>
 
             {/* Main grid content */}
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.2fr', gap: '24px', alignItems: 'stretch', height: 'calc(100vh - 120px)', overflow: 'hidden' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.2fr', gap: '24px', alignItems: 'start', zoom: 0.85 }}>
                 {/* Left Panel: Services Catalog */}
-                <div style={{ background: '#ffffff', borderRadius: '14px', padding: '24px', border: '1px solid #e5e7eb', height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                <div style={{ background: '#ffffff', borderRadius: '14px', padding: '24px', border: '1px solid #e5e7eb', maxHeight: 'calc(110vh - 120px)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                     {/* Category Filter */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px', flexShrink: 0 }}>
                         <span style={{ fontWeight: '600', fontSize: '15px' }}>pilih layanan</span>
@@ -205,7 +205,7 @@ const TransactionPage = () => {
                     </div>
 
                     {/* Services Grid */}
-                    <div className="services-grid" style={{ flexGrow: 1, overflowY: 'auto', paddingRight: '4px' }}>
+                    <div className="services-grid" style={{ flexGrow: 1, overflowY: 'auto', overflowX: 'hidden', paddingRight: '4px' }}>
                         {activeServices.map(service => (
                             <ServiceCard 
                                 key={service.id}

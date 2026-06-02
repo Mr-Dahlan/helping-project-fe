@@ -27,9 +27,9 @@ const OrderSummary = ({
     const isFormIncomplete = !customer.nama.trim() || !customer.nomor.trim() || !customer.alamat.trim();
 
     return (
-        <div className="transaction-right-panel" style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: '20px', overflow: 'hidden' }}>
+        <div className="transaction-right-panel">
             {/* Info Pelanggan Section */}
-            <div className="client-info-card" style={{ flexShrink: 0 }}>
+            <div className="client-info-card">
                 <h3 className="client-info-title">Info pelanggan</h3>
                 
                 <div className="form-group">
@@ -66,15 +66,22 @@ const OrderSummary = ({
             </div>
 
             {/* Keranjang Section */}
-            <div className="cart-card" style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexShrink: 0 }}>
-                    <h3 className="cart-title" style={{ margin: 0 }}>Keranjang</h3>
-                    <span style={{ fontSize: '13px', color: '#6b7280', fontWeight: '500' }}>
-                        {cart.reduce((sum, item) => sum + item.quantity, 0)} Porsi/kg
+            <div className="cart-card">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="9" cy="21" r="1"></circle>
+                            <circle cx="20" cy="21" r="1"></circle>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                        </svg>
+                        <h3 className="cart-title" style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>keranjang</h3>
+                    </div>
+                    <span style={{ fontSize: '14px', color: '#000', fontWeight: '500' }}>
+                        {cart.reduce((sum, item) => sum + item.quantity, 0)} item
                     </span>
                 </div>
 
-                <div className="cart-items-list" style={{ flexGrow: 1, overflowY: 'auto', marginBottom: '16px', maxHeight: 'none' }}>
+                <div className="cart-items-list">
                     {isCartEmpty ? (
                         <div style={{ textAlign: 'center', color: '#9ca3af', padding: '24px 0', fontSize: '14px' }}>
                             Keranjang kosong
@@ -92,24 +99,33 @@ const OrderSummary = ({
                     )}
                 </div>
 
-                <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', color: '#4b5563', flexShrink: 0 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span>Layanan Laundry</span>
-                        <span className="price-text">{formatRupiah(subtotal)}</span>
+                <div style={{ borderTop: '1px solid #d1d5db', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '14px', color: '#000' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#4b5563' }}>
+                        <span>Subtotal</span>
+                        <span>{formatRupiah(subtotal)}</span>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span>Pajak + PPN (11%)</span>
-                        <span className="price-text">{formatRupiah(tax)}</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#4b5563' }}>
+                        <span>Pajak (11%)</span>
+                        <span>{formatRupiah(tax)}</span>
                     </div>
-                    <div className="cart-total-section" style={{ marginBottom: '16px' }}>
+                    <div className="cart-total-section" style={{ display: 'flex', justifyContent: 'space-between', fontWeight: '700', borderTop: '1px dashed #d1d5db', paddingTop: '12px', marginTop: '4px', marginBottom: '8px' }}>
                         <span>TOTAL</span>
-                        <span className="price-text">{formatRupiah(total)}</span>
+                        <span className="price-text" style={{ fontSize: '15px' }}>{formatRupiah(total)}</span>
                     </div>
                     <button 
                         className="pay-btn" 
                         onClick={onPay}
                         disabled={isCartEmpty || isFormIncomplete || paying}
-                        style={{ width: '100%', display: 'block' }}
+                        style={{ 
+                            width: '100%', 
+                            display: 'block',
+                            backgroundColor: '#a7f3d0', 
+                            color: '#000', 
+                            borderRadius: '24px',
+                            padding: '14px',
+                            fontWeight: '600',
+                            border: 'none'
+                        }}
                     >
                         {paying ? 'Memproses...' : 'Selesaikan Pembayaran'}
                     </button>

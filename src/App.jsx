@@ -2,11 +2,18 @@ import { useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import './App.css'
 import Dashboard from './features/dashboard/DashboardPage';
+import AdminDashboard from './features/dashboard/AdminDashboard'; 
 import Transaction from './features/transaction/TransactionPage';
 import History from './features/history/HistoryPage';
 import Success from './features/transaction/SuccessPage';
 import Login from './features/auth/LoginPage';
 import Navbar from './components/Navbar';
+
+// IMPORT HALAMAN BARU ADMIN (Sesuaikan path jika perlu)
+import FinancialReports from './features/admin/FinancialReports';
+import ProductManagement from './features/admin/ProductManagement';
+import UserManagement from './features/admin/UserManagement';
+import CustomerDatabase from './features/admin/CustomerDatabase';
 
 function App() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -33,8 +40,14 @@ function App() {
     localStorage.removeItem('cashier_logged_in');
     localStorage.removeItem('cashier_name');
     localStorage.removeItem('cashier_outlet');
+    localStorage.removeItem('user_role'); 
     setShowLogoutModal(false);
     window.location.href = '/login';
+  };
+
+  const HomeRoute = () => {
+    const role = localStorage.getItem('user_role');
+    return role === 'admin' ? <AdminDashboard /> : <Dashboard />;
   };
 
   return (
@@ -44,10 +57,17 @@ function App() {
           <Route path="/login" element={<Login />} />
           
           <Route element={<ProtectedLayout />}>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<HomeRoute />} /> 
+            <Route path="/dashboard/AdminDashboard" element={<AdminDashboard />} />
             <Route path="/transaksi" element={<Transaction />} />
             <Route path="/riwayat" element={<History />} />
             <Route path="/success" element={<Success />} />
+
+            {/* RUTE TAMBAHAN UNTUK MENU-MENU ADMIN */}
+            <Route path="/admin/financial-reports" element={<FinancialReports />} />
+            <Route path="/admin/product-management" element={<ProductManagement />} />
+            <Route path="/admin/user-management" element={<UserManagement />} />
+            <Route path="/admin/customer-database" element={<CustomerDatabase />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />

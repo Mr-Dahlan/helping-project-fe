@@ -36,13 +36,21 @@ const HistoryPage = () => {
         }).format(num).replace('Rp', 'Rp ');
     };
 
-    // Format string tanggal
+    // Format string tanggal & waktu
     const formatDate = (dateStr) => {
-        if (!dateStr) return '-';
+        if (!dateStr) return { date: '-', time: '' };
         const date = new Date(dateStr);
-        if (isNaN(date.getTime())) return dateStr;
-        const options = { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' };
-        return date.toLocaleDateString('id-ID', options) + ' WIB'; // Diubah ke id-ID agar serasi dengan Rupiah dan menambahkan WIB
+        if (isNaN(date.getTime())) return { date: dateStr, time: '' };
+        
+        // Bagian tanggal: "26 Mei 2026"
+        const dateOptions = { day: 'numeric', month: 'short', year: 'numeric' };
+        const formattedDate = date.toLocaleDateString('id-ID', dateOptions);
+        
+        // Bagian waktu: "22.20 WIB"
+        const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: false };
+        const formattedTime = date.toLocaleTimeString('id-ID', timeOptions).replace(':', '.') + ' WIB';
+        
+        return { date: formattedDate, time: formattedTime };
     };
 
     const handleStatusChange = async (id, newStatus) => {
@@ -122,7 +130,7 @@ const HistoryPage = () => {
                                     <th>Alamat</th>
                                     <th>Total Bayar</th>
                                     <th>Status Pembayaran</th>
-                                    <th>Tanggal & Waktu</th>
+                                    <th style={{ whiteSpace: 'nowrap' }}>Tanggal & Waktu</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -160,7 +168,14 @@ const HistoryPage = () => {
                                                     <option value="cancel">cancel</option>
                                                 </select>
                                             </td>
-                                            <td>{formatDate(tx.created_at)}</td>
+                                            <td>
+                                                <div className="date-time-cell">
+                                                    <span className="date-text">{formatDate(tx.created_at).date}</span>
+                                                    {formatDate(tx.created_at).time && (
+                                                        <span className="time-text">{formatDate(tx.created_at).time}</span>
+                                                    )}
+                                                </div>
+                                            </td>
                                         </tr>
                                     );
                                 })}
