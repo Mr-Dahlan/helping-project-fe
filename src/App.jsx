@@ -14,6 +14,7 @@ import FinancialReports from './features/admin/FinancialReports';
 import ProductManagement from './features/admin/ProductManagement';
 import UserManagement from './features/admin/UserManagement';
 import CustomerDatabase from './features/admin/CustomerDatabase';
+import AdminHistoryPage from './features/admin/AdminHistoryPage';
 
 function App() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -68,6 +69,7 @@ function App() {
             <Route path="/admin/product-management" element={<ProductManagement />} />
             <Route path="/admin/user-management" element={<UserManagement />} />
             <Route path="/admin/customer-database" element={<CustomerDatabase />} />
+            <Route path="/admin/riwayat" element={<AdminHistoryPage />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />
@@ -76,12 +78,82 @@ function App() {
 
       {/* Global Logout Confirmation Modal */}
       {showLogoutModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3 className="modal-title">Apakah Anda Ingin Logout?</h3>
-            <div className="modal-buttons">
-              <button className="modal-btn no" onClick={() => setShowLogoutModal(false)}>NO</button>
-              <button className="modal-btn yes" onClick={handleConfirmLogout}>YES</button>
+        <div className="modal-overlay" onClick={() => setShowLogoutModal(false)}>
+          <div 
+            className="modal-content" 
+            onClick={(e) => e.stopPropagation()} 
+            style={{ 
+              maxWidth: '360px', 
+              padding: '32px 24px', 
+              borderRadius: '20px', 
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' 
+            }}
+          >
+            {/* Elegant warning icon */}
+            <div style={{
+              width: '56px',
+              height: '56px',
+              borderRadius: '50%',
+              backgroundColor: '#fef2f2',
+              color: '#ef4444',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 20px',
+            }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" x2="9" y1="12" y2="12" />
+              </svg>
+            </div>
+            
+            <h3 className="modal-title" style={{ fontSize: '18px', fontWeight: '700', marginBottom: '8px', color: '#111827' }}>Konfirmasi Logout</h3>
+            <p style={{ fontSize: '13px', color: '#6b7280', margin: '0 0 24px' }}>Apakah Anda yakin ingin keluar dari sistem? Anda harus masuk kembali untuk menginput transaksi baru.</p>
+            
+            <div className="modal-buttons" style={{ display: 'flex', gap: '12px' }}>
+              <button 
+                className="modal-btn no" 
+                onClick={() => setShowLogoutModal(false)}
+                style={{
+                  flex: 1,
+                  padding: '12px',
+                  borderRadius: '24px',
+                  backgroundColor: '#f3f4f6',
+                  color: '#4b5563',
+                  fontWeight: '700',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  transition: 'background-color 0.2s',
+                  width: 'auto'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#e5e7eb'}
+                onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'}
+              >
+                Batal
+              </button>
+              <button 
+                className="modal-btn yes" 
+                onClick={handleConfirmLogout}
+                style={{
+                  flex: 1,
+                  padding: '12px',
+                  borderRadius: '24px',
+                  backgroundColor: '#ef4444',
+                  color: '#ffffff',
+                  fontWeight: '700',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  transition: 'background-color 0.2s',
+                  width: 'auto'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#dc2626'}
+                onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#ef4444'}
+              >
+                Ya, Keluar
+              </button>
             </div>
           </div>
         </div>

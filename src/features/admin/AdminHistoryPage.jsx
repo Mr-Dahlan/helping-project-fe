@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { updateTransactionStatus } from '../../service/transactionService';
 
-const HistoryPage = () => {
+const AdminHistoryPage = () => {
     const [transactions, setTransactions] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(true);
@@ -17,7 +16,7 @@ const HistoryPage = () => {
                     setTransactions(res.data.data);
                 }
             } catch (err) {
-                console.error("Gagal mengambil riwayat transaksi:", err);
+                console.error("Gagal mengambil riwayat transaksi admin:", err);
             } finally {
                 setLoading(false);
             }
@@ -26,7 +25,7 @@ const HistoryPage = () => {
         fetchHistory();
     }, []);
 
-    // Format angka ke Rupiah
+    // Format Rupiah
     const formatRupiah = (num) => {
         if (num === undefined || num === null) return 'Rp 0';
         return new Intl.NumberFormat('id-ID', {
@@ -36,69 +35,48 @@ const HistoryPage = () => {
         }).format(num).replace('Rp', 'Rp ');
     };
 
-    // Format string tanggal & waktu
+    // Format Tanggal & Waktu
     const formatDate = (dateStr) => {
         if (!dateStr) return { date: '-', time: '' };
         const date = new Date(dateStr);
         if (isNaN(date.getTime())) return { date: dateStr, time: '' };
         
-        // Bagian tanggal: "26 Mei 2026"
         const dateOptions = { day: 'numeric', month: 'short', year: 'numeric' };
         const formattedDate = date.toLocaleDateString('id-ID', dateOptions);
         
-        // Bagian waktu: "22.20 WIB"
         const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: false };
         const formattedTime = date.toLocaleTimeString('id-ID', timeOptions).replace(':', '.') + ' WIB';
         
         return { date: formattedDate, time: formattedTime };
     };
 
-    const handleStatusChange = async (id, newStatus) => {
-        try {
-            await updateTransactionStatus(id, newStatus);
-            setTransactions(prev => 
-                prev.map(tx => tx.id === id ? { ...tx, status_pembayaran: newStatus } : tx)
-            );
-            
-            // Sync selected transaction modal if it's currently open
-            setSelectedTx(prev => prev && prev.id === id ? { ...prev, status_pembayaran: newStatus } : prev);
-        } catch (err) {
-            console.error("Gagal memperbarui status transaksi:", err);
-            // Local fallback update for offline testing
-            setTransactions(prev => 
-                prev.map(tx => tx.id === id ? { ...tx, status_pembayaran: newStatus } : tx)
-            );
-            setSelectedTx(prev => prev && prev.id === id ? { ...prev, status_pembayaran: newStatus } : prev);
-        }
-    };
-
-    // Filter transaksi berdasarkan query pencarian
+    // Filter pencarian
     const filteredTransactions = transactions.filter(tx => {
         const query = searchQuery.toLowerCase();
         const invoice = String(tx.invoice || tx.id || '').toLowerCase();
         const name = String(tx.nama_pelanggan || '').toLowerCase();
+        const kasir = String(tx.kasir || '').toLowerCase();
+        const metode = String(tx.metode_pembayaran || '').toLowerCase();
         
-        // Cari nama layanan
         let servicesStr = '';
         if (tx.details && tx.details.length > 0) {
             servicesStr = tx.details.map(d => d.layanan ? d.layanan.nama : '').join(' ').toLowerCase();
         }
         
-        // Format tanggal agar bisa di-search
         const dateObj = formatDate(tx.created_at);
         const dateStr = String(dateObj.date || '').toLowerCase();
         const timeStr = String(dateObj.time || '').toLowerCase();
-        const rawDateStr = String(tx.created_at || '').toLowerCase();
 
         return invoice.includes(query) || 
                name.includes(query) || 
+               kasir.includes(query) || 
+               metode.includes(query) || 
                servicesStr.includes(query) || 
                dateStr.includes(query) || 
-               timeStr.includes(query) || 
-               rawDateStr.includes(query);
+               timeStr.includes(query);
     });
 
-    // Helper to extract services text and format quantities as integer numbers
+    // Helper untuk detail layanan
     const getLayananText = (tx) => {
         if (tx.details && tx.details.length > 0) {
             return tx.details.map(d => {
@@ -116,12 +94,12 @@ const HistoryPage = () => {
             {/* Header Section */}
             <div className="dashboard-header">
                 <div className="header-title">
-                    <h1>Riwayat Transaksi</h1>
-                    <p>Daftar seluruh transaksi yang telah tercatat di outlet.</p>
+                    <h1>Riwayat Transaksi (Admin)</h1>
+                    <p>Audit dan monitor seluruh laporan transaksi masuk secara real-time.</p>
                 </div>
             </div>
 
-            {/* Controls: Search Bar */}
+            {/* Search Controls */}
             <div className="history-controls">
                 <div className="search-bar-container">
                     <svg className="search-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -130,7 +108,7 @@ const HistoryPage = () => {
                     </svg>
                     <input 
                         type="text" 
-                        placeholder="Cari nama, id transaksi, tanggal..." 
+                        placeholder="Cari ID transaksi, nama, kasir, metode pembayaran..." 
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="search-input"
@@ -138,22 +116,22 @@ const HistoryPage = () => {
                 </div>
             </div>
 
-            {/* Transactions Table Card */}
+            {/* Table Card */}
             <div className="table-card">
                 <div className="table-header">
-                    <span className="table-title">Daftar Transaksi</span>
-                    <span style={{ fontSize: '13px', color: '#6b7280' }}>
-                        Menampilkan {filteredTransactions.length} transaksi
+                    <span className="table-title">Audit Ledger Transaksi</span>
+                    <span style={{ fontSize: '13px', color: '#6b7280', fontWeight: '500' }}>
+                        Menampilkan {filteredTransactions.length} records
                     </span>
                 </div>
                 
                 {loading ? (
                     <div style={{ textAlign: 'center', padding: '40px 0', color: '#6b7280' }}>
-                        Mengambil data transaksi...
+                        Mengambil data audit ledger...
                     </div>
                 ) : filteredTransactions.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '40px 0', color: '#9ca3af' }}>
-                        {searchQuery ? 'Tidak ada transaksi yang cocok dengan pencarian.' : 'Belum ada riwayat transaksi.'}
+                        {searchQuery ? 'Tidak ada data yang cocok dengan kriteria pencarian.' : 'Belum ada transaksi terekam.'}
                     </div>
                 ) : (
                     <div className="data-table-container">
@@ -162,16 +140,16 @@ const HistoryPage = () => {
                                 <tr>
                                     <th>ID Transaksi</th>
                                     <th>Pelanggan</th>
-                                    <th>Layanan</th>
-                                    <th>No Handphone</th>
-                                    <th>Alamat</th>
+                                    <th>Layanan Utama</th>
+                                    <th>Kasir</th>
+                                    <th>Metode</th>
                                     <th>Total Bayar</th>
-                                    <th>Status Pembayaran</th>
-                                    <th style={{ whiteSpace: 'nowrap' }}>Tanggal & Waktu</th>
+                                    <th>Status</th>
+                                    <th>Tanggal & Waktu</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {filteredTransactions.map((tx) => {
+                                {[...filteredTransactions].sort((a, b) => b.id - a.id).map((tx) => {
                                     return (
                                         <tr 
                                             key={tx.id} 
@@ -179,36 +157,24 @@ const HistoryPage = () => {
                                             style={{ cursor: 'pointer' }}
                                             className="clickable-row"
                                         >
-                                            <td style={{ fontWeight: '600' }}>{tx.invoice || tx.id}</td>
+                                            <td style={{ fontWeight: '700', color: '#2563eb' }}>{tx.invoice || tx.id}</td>
                                             <td>{tx.nama_pelanggan}</td>
-                                            <td style={{ maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={getLayananText(tx)}>
+                                            <td style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={getLayananText(tx)}>
                                                 {getLayananText(tx)}
                                             </td>
-                                            <td>{tx.nomor_hp || '-'}</td>
-                                            <td>{tx.alamat || '-'}</td>
+                                            <td style={{ fontWeight: '500' }}>{tx.kasir || 'Siti Aminah'}</td>
+                                            <td style={{ textTransform: 'uppercase', fontSize: '12px', fontWeight: '600' }}>{tx.metode_pembayaran || 'cash'}</td>
                                             <td className="price-text" style={{ fontWeight: '600' }}>{formatRupiah(tx.total_harga)}</td>
                                             <td>
-                                                <select 
-                                                    value={tx.status_pembayaran}
-                                                    onClick={(e) => e.stopPropagation()}
-                                                    onChange={(e) => {
-                                                        e.stopPropagation();
-                                                        handleStatusChange(tx.id, e.target.value);
-                                                    }}
-                                                    className={`status-select ${tx.status_pembayaran}`}
-                                                >
-                                                    <option value="antri">antri</option>
-                                                    <option value="proses">proses</option>
-                                                    <option value="selesai">selesai</option>
-                                                    <option value="diambil">diambil</option>
-                                                    <option value="batal">batal</option>
-                                                </select>
+                                                <span className={`badge ${tx.status_pembayaran}`} style={{ fontSize: '11px', padding: '4px 10px', fontWeight: '700' }}>
+                                                    {tx.status_pembayaran}
+                                                </span>
                                             </td>
                                             <td>
                                                 <div className="date-time-cell">
                                                     <span className="date-text">{formatDate(tx.created_at).date}</span>
                                                     {formatDate(tx.created_at).time && (
-                                                        <span className="time-text">{formatDate(tx.created_at).time}</span>
+                                                        <span className="time-text" style={{ fontSize: '11px', color: '#6b7280' }}>{formatDate(tx.created_at).time}</span>
                                                     )}
                                                 </div>
                                             </td>
@@ -221,7 +187,7 @@ const HistoryPage = () => {
                 )}
             </div>
 
-            {/* Gorgeous popup card for detail transaction */}
+            {/* Premium detail modal */}
             {selectedTx && (
                 <div className="modal-overlay" onClick={() => setSelectedTx(null)}>
                     <div 
@@ -236,7 +202,6 @@ const HistoryPage = () => {
                             boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
                         }}
                     >
-                        {/* Close button */}
                         <button 
                             onClick={() => setSelectedTx(null)}
                             style={{
@@ -257,8 +222,6 @@ const HistoryPage = () => {
                                 fontSize: '13px',
                                 transition: 'background-color 0.2s'
                             }}
-                            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#e5e7eb'}
-                            onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'}
                         >
                             X
                         </button>
@@ -339,4 +302,4 @@ const HistoryPage = () => {
     );
 };
 
-export default HistoryPage;
+export default AdminHistoryPage;

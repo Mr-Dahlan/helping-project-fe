@@ -52,13 +52,24 @@ const OrderSummary = ({
                     />
                 </div>
 
-                <div className="form-group" style={{ marginBottom: 0 }}>
+                <div className="form-group">
                     <textarea 
                         placeholder="Alamat" 
                         value={customer.alamat} 
                         onChange={(e) => setCustomer({ ...customer, alamat: e.target.value })}
                         className="form-input"
-                        rows="3"
+                        rows="2"
+                        style={{ resize: 'none', fontFamily: 'inherit' }}
+                    />
+                </div>
+
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                    <textarea 
+                        placeholder="Catatan Laundry (Contoh: jangan dicampur, setrika licin)" 
+                        value={customer.catatan || ''} 
+                        onChange={(e) => setCustomer({ ...customer, catatan: e.target.value })}
+                        className="form-input"
+                        rows="2"
                         style={{ resize: 'none', fontFamily: 'inherit' }}
                     />
                 </div>
@@ -112,6 +123,36 @@ const OrderSummary = ({
                         <span>TOTAL</span>
                         <span className="price-text" style={{ fontSize: '15px' }}>{formatRupiah(total)}</span>
                     </div>
+
+                    {/* Metode Pembayaran */}
+                    <div style={{ marginBottom: '8px' }}>
+                        <span style={{ fontSize: '13px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '8px' }}>Metode Pembayaran</span>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                            {['cash', 'tf', 'qris'].map((m) => (
+                                <button
+                                    key={m}
+                                    type="button"
+                                    onClick={() => setCustomer({ ...customer, metode_pembayaran: m })}
+                                    style={{
+                                        flex: 1,
+                                        padding: '10px 6px',
+                                        borderRadius: '12px',
+                                        border: customer.metode_pembayaran === m ? '2px solid #10b981' : '1px solid #d1d5db',
+                                        backgroundColor: customer.metode_pembayaran === m ? '#ecfdf5' : '#ffffff',
+                                        color: customer.metode_pembayaran === m ? '#065f46' : '#374151',
+                                        fontWeight: '700',
+                                        fontSize: '12px',
+                                        textTransform: 'uppercase',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.15s ease'
+                                    }}
+                                >
+                                    {m}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
                     <button 
                         className="pay-btn" 
                         onClick={onPay}
@@ -124,7 +165,8 @@ const OrderSummary = ({
                             borderRadius: '24px',
                             padding: '14px',
                             fontWeight: '600',
-                            border: 'none'
+                            border: 'none',
+                            cursor: 'pointer'
                         }}
                     >
                         {paying ? 'Memproses...' : 'Selesaikan Pembayaran'}

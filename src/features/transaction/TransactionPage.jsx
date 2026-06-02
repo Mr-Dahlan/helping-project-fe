@@ -7,7 +7,7 @@ import OrderSummary from './OrderSummary';
 
 const TransactionPage = () => {
     const navigate = useNavigate();
-    const [customer, setCustomer] = useState({ nama: '', nomor: '', alamat: '' });
+    const [customer, setCustomer] = useState({ nama: '', nomor: '', alamat: '', catatan: '', metode_pembayaran: 'cash' });
     const [category, setCategory] = useState('normal'); // 'express' atau 'normal'
     const [cart, setCart] = useState([]);
     const [paying, setPaying] = useState(false);
@@ -120,7 +120,10 @@ const TransactionPage = () => {
                 nomor: customer.nomor,
                 alamat: customer.alamat,
                 total: total,
-                cart: cart
+                cart: cart,
+                catatan: customer.catatan,
+                metode_pembayaran: customer.metode_pembayaran,
+                kasir: localStorage.getItem('cashier_name') || 'Siti Aminah'
             };
 
             const res = await postTransaction(payload);
@@ -128,10 +131,13 @@ const TransactionPage = () => {
             if (res.status === 'success') {
                 // Save checkout receipt details locally so SuccessPage can render high-fidelity receipt
                 const receiptDetails = {
-                    invoice: res.data.invoice || 'INV-' + Date.now(),
+                    invoice: res.data.invoice || '1005',
                     nama_pelanggan: customer.nama,
                     nomor_hp: customer.nomor,
                     alamat: customer.alamat,
+                    catatan: customer.catatan,
+                    metode_pembayaran: customer.metode_pembayaran,
+                    kasir: localStorage.getItem('cashier_name') || 'Siti Aminah',
                     subtotal: subtotal,
                     tax: tax,
                     total: total,
