@@ -308,9 +308,9 @@ const RegisterPage = () => {
                 Owner
               </option>
 
-              {/* <option value="admin">
+              <option value="admin">
                 Admin
-              </option> */}
+              </option>
 
               <option value="cashier">
                 Kasir

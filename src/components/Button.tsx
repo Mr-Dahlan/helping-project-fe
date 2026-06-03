@@ -1,6 +1,5 @@
-import React from 'react';
 
-const Button = ({ children, onClick, type = 'button', variant = 'primary', className = '', disabled = false }) => {
+const Button = ({ children, onClick,  variant = 'primary', className = '', disabled = false }) => {
     const getStyles = () => {
         const base = {
             padding: '10px 20px',

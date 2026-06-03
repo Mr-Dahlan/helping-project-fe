@@ -4,14 +4,14 @@ import MetricCard from '../components/MetricCard';
 import RecentTransactionsTable from '../components/RecentTransactionsTable';
 
 // ── Helpers ───────────────────────────────────────────────────────────────
-const formatRupiah = (num: number) =>
-    new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
+const formatRupiah = (
+    num: number | string
+) =>
+    new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
         minimumFractionDigits: 0,
-    })
-        .format(num)
-        .replace('Rp', 'Rp ');
+    }).format(Number(num));
 
 // ── Icons ─────────────────────────────────────────────────────────────────
 const IconOrder = () => (

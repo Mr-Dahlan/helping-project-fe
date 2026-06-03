@@ -1,43 +1,165 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+// src/pages/LoginPage.tsx
+
+import { useEffect, useState } from "react";
+
+import {
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+
 import { Eye, EyeOff } from "lucide-react";
 
 import { useAuth } from "../hooks/useAuth";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+
+  const location = useLocation();
+
+  const {
+    login,
+    user,
+    loading: authLoading,
+  } = useAuth();
 
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
-  const [showPassword, setShowPassword] = useState(false);
+  const [password, setPassword] =
+    useState("");
+
+  const [showPassword, setShowPassword] =
+    useState(false);
 
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const [loading, setLoading] =
+    useState(false);
+
+  /*
+  |--------------------------------------------------------------------------
+  | AUTO REDIRECT JIKA SUDAH LOGIN
+  |--------------------------------------------------------------------------
+  */
+  useEffect(() => {
+    if (authLoading) return;
+
+    if (!user) return;
+
+    /*
+    |--------------------------------------------------------------------------
+    | JIKA SUDAH DI HALAMAN ADMIN
+    |--------------------------------------------------------------------------
+    */
+    if (
+      user.role === "admin" &&
+      location.pathname.startsWith("/admin")
+    ) {
+      return;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | REDIRECT BERDASARKAN ROLE
+    |--------------------------------------------------------------------------
+    */
+    if (user.role === "admin") {
+      navigate("/admin/dashboard", {
+        replace: true,
+      });
+    } else {
+      navigate("/", {
+        replace: true,
+      });
+    }
+  }, [
+    user,
+    authLoading,
+    navigate,
+    location.pathname,
+  ]);
+
+  /*
+  |--------------------------------------------------------------------------
+  | LOGIN SUBMIT
+  |--------------------------------------------------------------------------
+  */
+  const handleSubmit = async (
+    e: React.FormEvent
+  ) => {
     e.preventDefault();
 
     setError("");
+
     setLoading(true);
 
     try {
-      await login(email, password);
+      const loggedInUser = await login(
+        email,
+        password
+      );
 
-      navigate("/");
-    } catch (err: any) {
-      console.error(err);
-
-      if (err.response?.data?.message) {
-        setError(err.response.data.message);
+      /*
+      |--------------------------------------------------------------------------
+      | REDIRECT BERDASARKAN ROLE
+      |--------------------------------------------------------------------------
+      */
+      if (
+        loggedInUser.role === "admin"
+      ) {
+        navigate("/admin/dashboard", {
+          replace: true,
+        });
       } else {
-        setError("Tidak dapat terhubung ke server.");
+        navigate("/", {
+          replace: true,
+        });
+      }
+    } catch (err: any) {
+      console.error(
+        "LOGIN ERROR:",
+        err
+      );
+
+      if (
+        err.response?.data?.message
+      ) {
+        setError(
+          err.response.data.message
+        );
+      } else {
+        setError(
+          "Tidak dapat terhubung ke server."
+        );
       }
     } finally {
       setLoading(false);
     }
   };
+
+  /*
+  |--------------------------------------------------------------------------
+  | LOADING RESTORE SESSION
+  |--------------------------------------------------------------------------
+  */
+  if (authLoading) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background:
+            "linear-gradient(to bottom right, #111827, #1f2937)",
+          color: "#fff",
+          fontSize: "16px",
+          fontWeight: "600",
+        }}
+      >
+        Memuat sesi login...
+      </div>
+    );
+  }
 
   return (
     <div
@@ -46,7 +168,8 @@ const LoginPage = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "linear-gradient(to bottom right, #111827, #1f2937)",
+        background:
+          "linear-gradient(to bottom right, #111827, #1f2937)",
         padding: "20px",
       }}
     >
@@ -57,18 +180,25 @@ const LoginPage = () => {
           background: "#ffffff",
           borderRadius: "24px",
           padding: "40px",
-          boxShadow: "0 20px 50px rgba(0,0,0,0.25)",
+          boxShadow:
+            "0 20px 50px rgba(0,0,0,0.25)",
         }}
       >
         {/* HEADER */}
-        <div style={{ textAlign: "center", marginBottom: "32px" }}>
+        <div
+          style={{
+            textAlign: "center",
+            marginBottom: "32px",
+          }}
+        >
           <div
             style={{
               width: "72px",
               height: "72px",
               margin: "0 auto 18px",
               borderRadius: "20px",
-              background: "linear-gradient(to bottom right, #2563eb, #1d4ed8)",
+              background:
+                "linear-gradient(to bottom right, #2563eb, #1d4ed8)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -85,10 +215,23 @@ const LoginPage = () => {
               strokeLinecap="round"
               strokeLinejoin="round"
             >
-              <circle cx="12" cy="12" r="10" />
+              <circle
+                cx="12"
+                cy="12"
+                r="10"
+              />
+
               <path d="M8 12a4 4 0 1 0 8 0 4 4 0 1 0-8 0" />
+
               <path d="M12 12h.01" />
-              <rect width="6" height="4" x="9" y="4" rx="1" />
+
+              <rect
+                width="6"
+                height="4"
+                x="9"
+                y="4"
+                rx="1"
+              />
             </svg>
           </div>
 
@@ -109,7 +252,8 @@ const LoginPage = () => {
               fontSize: "14px",
             }}
           >
-            Login untuk mengakses dashboard
+            Login untuk mengakses
+            dashboard
           </p>
         </div>
 
@@ -131,8 +275,11 @@ const LoginPage = () => {
 
         {/* FORM */}
         <form onSubmit={handleSubmit}>
-          {/* EMAIL */}
-          <div style={{ marginBottom: "18px" }}>
+          <div
+            style={{
+              marginBottom: "18px",
+            }}
+          >
             <label
               style={{
                 display: "block",
@@ -149,23 +296,31 @@ const LoginPage = () => {
               type="email"
               placeholder="Masukkan email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) =>
+                setEmail(e.target.value)
+              }
               disabled={loading}
               required
               style={{
                 width: "100%",
-                padding: "14px 16px",
+                padding:
+                  "14px 16px",
                 borderRadius: "14px",
-                border: "1px solid #d1d5db",
+                border:
+                  "1px solid #d1d5db",
                 outline: "none",
                 fontSize: "15px",
-                boxSizing: "border-box",
+                boxSizing:
+                  "border-box",
               }}
             />
           </div>
 
-          {/* PASSWORD */}
-          <div style={{ marginBottom: "24px" }}>
+          <div
+            style={{
+              marginBottom: "24px",
+            }}
+          >
             <label
               style={{
                 display: "block",
@@ -184,38 +339,59 @@ const LoginPage = () => {
               }}
             >
               <input
-                type={showPassword ? "text" : "password"}
+                type={
+                  showPassword
+                    ? "text"
+                    : "password"
+                }
                 placeholder="Masukkan password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) =>
+                  setPassword(
+                    e.target.value
+                  )
+                }
                 disabled={loading}
                 required
                 style={{
                   width: "100%",
-                  padding: "14px 50px 14px 16px",
-                  borderRadius: "14px",
-                  border: "1px solid #d1d5db",
+                  padding:
+                    "14px 50px 14px 16px",
+                  borderRadius:
+                    "14px",
+                  border:
+                    "1px solid #d1d5db",
                   outline: "none",
                   fontSize: "15px",
-                  boxSizing: "border-box",
+                  boxSizing:
+                    "border-box",
                 }}
               />
 
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
+                onClick={() =>
+                  setShowPassword(
+                    !showPassword
+                  )
+                }
                 style={{
-                  position: "absolute",
+                  position:
+                    "absolute",
                   right: "14px",
                   top: "50%",
-                  transform: "translateY(-50%)",
+                  transform:
+                    "translateY(-50%)",
                   border: "none",
-                  background: "transparent",
+                  background:
+                    "transparent",
                   cursor: "pointer",
                   color: "#6b7280",
                   display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  alignItems:
+                    "center",
+                  justifyContent:
+                    "center",
                 }}
               >
                 {showPassword ? (
@@ -227,7 +403,6 @@ const LoginPage = () => {
             </div>
           </div>
 
-          {/* BUTTON */}
           <button
             type="submit"
             disabled={loading}
@@ -236,19 +411,24 @@ const LoginPage = () => {
               padding: "15px",
               border: "none",
               borderRadius: "14px",
-              background: loading ? "#9ca3af" : "#2563eb",
+              background: loading
+                ? "#9ca3af"
+                : "#2563eb",
               color: "#ffffff",
               fontSize: "15px",
               fontWeight: "600",
-              cursor: loading ? "not-allowed" : "pointer",
+              cursor: loading
+                ? "not-allowed"
+                : "pointer",
               transition: "0.2s",
               marginBottom: "16px",
             }}
           >
-            {loading ? "Menghubungkan..." : "Masuk"}
+            {loading
+              ? "Menghubungkan..."
+              : "Masuk"}
           </button>
 
-          {/* LINK REGISTER */}
           <p
             style={{
               textAlign: "center",
@@ -259,7 +439,9 @@ const LoginPage = () => {
           >
             Belum punya akun?{" "}
             <span
-              onClick={() => navigate("/register")}
+              onClick={() =>
+                navigate("/register")
+              }
               style={{
                 color: "#2563eb",
                 cursor: "pointer",

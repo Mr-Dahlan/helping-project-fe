@@ -41,3 +41,9 @@ export interface Order {
   created_at: string;
   updated_at: string;
 }
+
+// src/types/Order.ts
+export interface Order {
+  // ... field yang ada sekarang ...
+  details?: OrderItem[];  // tambahkan ini
+}

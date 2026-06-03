@@ -11,6 +11,9 @@ export const orderService = {
   // 📌 get all orders
   getAll: async (): Promise<Order[]> => {
     const res = await axios.get("/orders");
+
+    console.log("ORDER RESPONSE:", res.data);
+
     return res.data.data;
   },
 
